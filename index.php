@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <!-- Required meta tags -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+        <link rel="stylesheet" href="fileupload.css">
+        <title>Hello, world!</title>
+    </head>
+    <body>
+        <h1>Hello, world!</h1>
+        <div class="container" id="app">
+            <div class="row">
+                <div class="col-md-12">
+                    <!-- <form id="myForm" v-on:submit.prevent="submitForm"> -->
+                        <div class="form-group">
+                            <label for="exampleInputEmail1">Email address</label>
+                            <input type="text" name="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email" v-model="formData.email">
+                        </div>
+                        <div class="form-group">
+                            <label for="exampleInputPassword1">Password</label>
+                            <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password" v-model="formData.password">
+                        </div>
+                        <!-- <input type="file" name="myFile" multiple=""  @change="onFileChanged"> -->
+                        <div class="d-flex">
+                            <template v-for="( file,index ) in formData.images">
+                                <image-selector v-model="formData.images" :file_index="index" :type="'multiple'" :callback="myFunction"></image-selector>
+                            </template>
+                        </div>
+                        <div class="form-group">
+                           <button class="btn btn-primary" @click="addFile">Add</button>
+                        </div>
+                        <button type="submit" class="btn btn-primary" @click="submitForm">Submit</button>
+                    <!-- </form> -->
+                </div>
+                <div class="col-md-6"></div>
+            </div>
+        </div>
+        <!-- Optional JavaScript -->
+        <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+        <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+        <script src="imageUpload.js"></script>
+        <script>
+              var app = new Vue({
+                el: '#app',
+                data: {
+                    message: 'Hello Vue!',
+                    selectedFile : [],
+                    files : [],
+                    formData : {
+                        email : '',
+                        password : '',
+                        images : [{
+                                    caption: '',
+                                    imageUrl : '',
+                                    base64 : ''
+                                }]
+                    }
+                },
+                methods: {
+                    submitForm(){
+                        //let myForm = document.getElementById('myForm');
+                        const formData = new FormData()
+                        // console.log(formData);
+                        for ( var key in this.formData ) {
+                            formData.append(key, this.formData[key]);
+                        }
+
+                        $.ajax({
+                            url: "fileajax.php",
+                            method : 'post',
+                            processData: false,
+                            contentType: false,
+                            data : formData
+                        }).done(function() {
+                            
+                        });
+                    },
+                    onFileChanged (event) {
+                    
+                        let reader;
+
+                        for (var i=0; i < event.target.files.length; i++) {
+                            reader = new FileReader();
+                            reader.onload = (function(self,file) {
+                              return function(e) {
+                                self.formData.images.push({
+                                                            caption: '',
+                                                            imageURl : '',
+                                                            base64 : e.target.result
+                                                        });
+                              };
+                            })(this,event.target.files[i]);
+                            reader.readAsDataURL(event.target.files[i]);
+                        }
+                    },
+                    addFile (){
+                        this.formData.images.push({
+                                                    caption: '',
+                                                    imageURl : '',
+                                                    base64 : ''
+                                                });
+                    },
+                    myFunction (index , callback) {
+                        console.log(this.formData.images);
+                        return callback();
+                    }
+                }
+            })
+        </script>
+  </body>
+</html>
