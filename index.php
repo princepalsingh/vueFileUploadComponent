@@ -28,7 +28,7 @@
                         <!-- <input type="file" name="myFile" multiple=""  @change="onFileChanged"> -->
                         <div class="d-flex">
                             <template v-for="( file,index ) in formData.images">
-                                <image-selector v-model="formData.images" :file_index="index" :type="'multiple'" :callback="myFunction"></image-selector>
+                                <image-selector v-model="file" :file_index="index" :type="'multiple'" :callback="myFunction" :key="file.order"></image-selector>
                             </template>
                         </div>
                         <div class="form-group">
@@ -58,6 +58,7 @@
                         email : '',
                         password : '',
                         images : [{
+                                    order : 0,
                                     caption: '',
                                     imageUrl : '',
                                     base64 : ''
@@ -103,13 +104,21 @@
                     },
                     addFile (){
                         this.formData.images.push({
+                                                    order : Math.floor((Math.random() * 100) + 1),
                                                     caption: '',
-                                                    imageURl : '',
+                                                    imageUrl : '',
                                                     base64 : ''
                                                 });
+                        // this.$set(this.formData.images,0,{
+                        //                             caption: '',
+                        //                             imageUrl : '',
+                        //                             base64 : ''
+                        //                         });
                     },
                     myFunction (index , callback) {
-                        console.log(this.formData.images);
+                        console.log(index);
+                        // console.log(this.formData.images[index].base64);
+                        this.$delete(this.formData.images,index, 1);
                         return callback();
                     }
                 }

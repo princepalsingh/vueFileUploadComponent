@@ -8,7 +8,7 @@ var template = `<div class="col-sm-2 pl-0">
                         <label class="btn btn-primary btn-primary-custom">
                             Upload<input type="file" class="uploadFile img" value="Upload Photo" ref="fileupload" @change="onFileChanged" style="width: 0px;height: 0px;overflow: hidden;">
                         </label>
-                        <i class="fa fa-times del" v-if="deleteButton" @click="deleteAction"></i>
+                        <i class="fa fa-times del" v-if="deleteButton" @click="deleteAction()"></i>
                     </div><!-- col-2 -->
                     <!--<input type="file" name="myFile" @change="onFileChanged"> 
                     <img :src="file.base64" placeholder="No Image" v-if="">-->
@@ -18,11 +18,10 @@ Vue.component('image-selector', {
     props: ['value', 'file_index', 'type' , 'callback'],
     data: function () {
         return {
-            file : {},
+            file : this.value,
             index : this.file_index,
             fileName : '',
             blankImageUrl: '//cliquecities.com/assets/no-image-e3699ae23f866f6cbdf8ba2443ee5c4e.jpg',
-            allFiles : this.value,
             actionType : this.type,
             callback : this.callback
         }
@@ -55,38 +54,27 @@ Vue.component('image-selector', {
         },
         deleteAction : function(){
             var self = this;
-            if (this.actionType == 'single') {
-                if (this.callback == undefined) {
-                    this.file.base64 = '';
-                    event.target.files = {}
-                    const input = this.$refs.fileupload;
-                    input.type = 'text';
-                    input.type = 'file';
-                } else {
-                    this.callback(this.index, function () {
-                        self.file.base64 = '';
-                        event.target.files = {}
-                        const input = self.$refs.fileupload;
-                        input.type = 'text';
-                        input.type = 'file';
-                    });
-                }
-            }else{
-                if (this.callback == undefined) {
-                    this.$delete(this.allFiles,this.index);
-                }else{
-                    this.callback(this.index,function(){
-                        self.$delete(self.allFiles, self.index);
-                    });
-                }
+            // console.log(this.index);
+            if (this.callback == undefined) {
+                this.file.base64 = '';
+                event.target.files = {}
+                const input = this.$refs.fileupload;
+                input.type = 'text';
+                input.type = 'file';
+            } else {
+                this.callback(this.index, function () {
+                    // self.file.base64 = '';
+                    // event.target.files = {}
+                    // const input = self.$refs.fileupload;
+                    // input.type = 'text';
+                    // input.type = 'file';
+                });
             }
-
-            // return this.callback();
         }
     },
     computed : {
         sourceImage : function(){
-            // console.log('hi');
+            console.log('hi');
             // console.log(this.file.imageUrl);
             if (this.file.imageUrl == '' && this.file.base64 == '') {
                 // console.log('first');
@@ -100,20 +88,39 @@ Vue.component('image-selector', {
             }
         },
         deleteButton : function(){
-            if (this.file.imageUrl == '' && this.file.base64 == '') {
-                return false;
+            if (this.actionType == 'single') {
+                if (this.file.imageUrl == '' && this.file.base64 == '') {
+                    return false;
+                }else{
+                    return true;
+                }
+                
             }else{
                 return true;
             }
         }
     },
+    watch : {
+        file: {
+            handler: function (newValue) {
+                this.file = newValue
+                // console.log(newValue.base64)
+                // console.log("New age: " + newValue.age)
+            },
+            deep: true
+        },
+        file_index : function(value){
+            this.index = value;
+        }
+    },
     mounted(){
-        this.file = this.allFiles[this.index];
         this.actionType = this.type == undefined ? 'single' : this.type;
-        console.log(this.file);
-        console.log(this.index);
-        console.log(this.allFiles);
-        console.log(this.type);
-        console.log(this.callback);
+        this.file.order = Math.floor((Math.random() * 100) + 1);
+        // console.log(this.file_index);
+        // console.log(this.file);
+        // console.log(this.index);
+        // console.log(this.allFiles);
+        // console.log(this.type);
+        // console.log(this.callback);
     }
 })
