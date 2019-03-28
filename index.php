@@ -27,8 +27,12 @@
                         </div>
                         <!-- <input type="file" name="myFile" multiple=""  @change="onFileChanged"> -->
                         <div class="d-flex">
-                            <template v-for="( file,index ) in formData.images">
-                                <image-selector v-model="file" :file_index="index" :type="'multiple'" :callback="myFunction" :key="file.order"></image-selector>
+                            <!-- <template v-for="( file,index ) in formData.images">
+                                <image-selector v-model="file" :file_index="index" :type="'single'" :callback="myFunction" :key="file.order"></image-selector>
+                            </template> -->
+
+                            <template>
+                                <image-selector v-model="formData.images" :type="'single'" :callback="myFunction" :key="formData.images.order"></image-selector>
                             </template>
                         </div>
                         <div class="form-group">
@@ -57,50 +61,36 @@
                     formData : {
                         email : '',
                         password : '',
-                        images : [{
+                        // images : [{
+                        //             order : 0,
+                        //             caption: '',
+                        //             imageUrl : '',
+                        //             base64 : ''
+                        //         }]
+                        images : {
                                     order : 0,
                                     caption: '',
                                     imageUrl : '',
                                     base64 : ''
-                                }]
+                                }       
                     }
                 },
                 methods: {
                     submitForm(){
-                        //let myForm = document.getElementById('myForm');
-                        const formData = new FormData()
-                        // console.log(formData);
-                        for ( var key in this.formData ) {
-                            formData.append(key, this.formData[key]);
-                        }
+                        // const formData = new FormData()
+                        // for ( var key in this.formData ) {
+                        //     formData.append(key, this.formData[key]);
+                        // }
 
                         $.ajax({
                             url: "fileajax.php",
                             method : 'post',
-                            processData: false,
-                            contentType: false,
-                            data : formData
-                        }).done(function() {
-                            
+                            // processData: false,
+                            // contentType: false,
+                            data : { email : this.formData.email , password : this.formData.password , images : this.formData.images }
+                        }).done(function( result ) {
+                            console.log( result );
                         });
-                    },
-                    onFileChanged (event) {
-                    
-                        let reader;
-
-                        for (var i=0; i < event.target.files.length; i++) {
-                            reader = new FileReader();
-                            reader.onload = (function(self,file) {
-                              return function(e) {
-                                self.formData.images.push({
-                                                            caption: '',
-                                                            imageURl : '',
-                                                            base64 : e.target.result
-                                                        });
-                              };
-                            })(this,event.target.files[i]);
-                            reader.readAsDataURL(event.target.files[i]);
-                        }
                     },
                     addFile (){
                         this.formData.images.push({
@@ -109,15 +99,9 @@
                                                     imageUrl : '',
                                                     base64 : ''
                                                 });
-                        // this.$set(this.formData.images,0,{
-                        //                             caption: '',
-                        //                             imageUrl : '',
-                        //                             base64 : ''
-                        //                         });
                     },
                     myFunction (index , callback) {
                         console.log(index);
-                        // console.log(this.formData.images[index].base64);
                         this.$delete(this.formData.images,index, 1);
                         return callback();
                     }

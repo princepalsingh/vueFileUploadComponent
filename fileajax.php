@@ -1,62 +1,65 @@
 <?php 
-	print_r($_FILES);
-	print_r($_POST);
-	exit;
-	function moveUploadedFiles($files,$key,$folder = '../uploads/'){
+	function base64_to_jpeg($postArray,$uploadPath = '') {
 
-		if ($folder == "") 
-		{
-			$folder = "../uploads/";
+		if ($uploadPath == '') {
+			$uploadPath = 'uploads/';
 		}
 
-		if(!is_dir($folder))
-		{
-		  mkdir($folder, 0755);
+		if(!is_dir($uploadPath)){
+			mkdir($uploadPath,0755);
 		}
-
-		$file_arr = array();
-
-	    /* Rename file if already exist */
-		$fname = $files['name'][$key];
-		$fname = str_replace(" ", "-", $fname);
-		$rawBaseName = pathinfo($fname, PATHINFO_FILENAME );
-		$extension = pathinfo($fname, PATHINFO_EXTENSION );
-		$counter = 0;
-		while(file_exists($folder.$fname))
+		if (count($postArray['images']) == count($postArray['images'], COUNT_RECURSIVE))
 		{
-			$fname = $rawBaseName . $counter . '.' . $extension;
-			$counter++;
+			$img = explode(',', $postArray['images']['base64']);
+			$ini =substr($img[0], 11);
+			$type = explode(';', $ini);
+
+			$output_file = $uploadPath.strtotime(date('Y-m-d H:i:s')).mt_rand(0,100).'.'.$type[0];
+			// open the output file for writing
+			$ifp = fopen( $output_file, 'wb' ); 
+			chmod($output_file,0755);
+			// split the string on commas
+			// $data[ 0 ] == "data:image/png;base64"
+			// $data[ 1 ] == <actual base64 string>
+			$data = explode( ',', $postArray['images']['base64'] );
+
+			// we could add validation here with ensuring count( $data ) > 1
+			fwrite( $ifp, base64_decode( $data[ 1 ] ) );
+
+			// clean up the file resource
+			fclose( $ifp );
+			$postArray['images']['imageUrl'] = $output_file;
+			$postArray['images']['base64'] = '';
 		}
-		/* Rename file if already exist */
-			
-		move_uploaded_file($files['tmp_name'][$key], $folder.$fname);
-		$file_arr = array('new_file_name'=>$fname);
+		else
+		{
+			foreach ($postArray['images'] as $key => $value) {
+				$img = explode(',', $value['base64']);
+				$ini =substr($img[0], 11);
+				$type = explode(';', $ini);
 
-	  	return $file_arr;
-		
+				$output_file = $uploadPath.strtotime(date('Y-m-d H:i:s')).mt_rand(0,100).'.'.$type[0];
+				// open the output file for writing
+				$ifp = fopen( $output_file, 'wb' ); 
+				chmod($output_file,0755);
+				// split the string on commas
+				// $data[ 0 ] == "data:image/png;base64"
+				// $data[ 1 ] == <actual base64 string>
+				$data = explode( ',', $value['base64'] );
+
+				// we could add validation here with ensuring count( $data ) > 1
+				fwrite( $ifp, base64_decode( $data[ 1 ] ) );
+
+				// clean up the file resource
+				fclose( $ifp );
+				$postArray['images'][$key]['imageUrl'] = $output_file;
+				$postArray['images'][$key]['base64'] = '';
+			}
+		}
+	    return $postArray; 
 	}
 
-	for ($i=0; $i < sizeof($_FILES['myFile']['name']); $i++) { 
-		$result = moveUploadedFiles($_FILES['myFile'],$i,'uploads/');
-		echo $result['new_file_name'];
-		echo '<br>';
-	}
+	$updatedPost = base64_to_jpeg($_POST,'uploads/');
 
-	function base64_to_jpeg($base64_string, $output_file) {
-	    // open the output file for writing
-	    $ifp = fopen( $output_file, 'wb' ); 
-
-	    // split the string on commas
-	    // $data[ 0 ] == "data:image/png;base64"
-	    // $data[ 1 ] == <actual base64 string>
-	    $data = explode( ',', $base64_string );
-
-	    // we could add validation here with ensuring count( $data ) > 1
-	    fwrite( $ifp, base64_decode( $data[ 1 ] ) );
-
-	    // clean up the file resource
-	    fclose( $ifp ); 
-
-	    return $output_file; 
-	}
+	print_r($updatedPost);	
 ?>

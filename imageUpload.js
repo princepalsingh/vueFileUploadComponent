@@ -29,8 +29,6 @@ Vue.component('image-selector', {
     template: template,
     methods:{
         onFileChanged(){
-            // console.log(this.file);
-            // console.log(this.index);
             let reader;
             reader = new FileReader();
             reader.onload = (function (self, file) {
@@ -40,51 +38,37 @@ Vue.component('image-selector', {
             })(this, event.target.files[0]);
             reader.readAsDataURL(event.target.files[0]);
             this.fileName = event.target.files[0].name;
-            // for (var i=0; i < event.target.files.length; i++) {
-            //     reader = new FileReader();
-            //     reader.onload = (function(self,file) {
-            //         return function(e) {
-            //             self.file.base64 = e.target.result;
-            //         };
-            //     })(this,event.target.files[i]);
-            //     reader.readAsDataURL(event.target.files[i]);
-            //     // console.log(event.target.files[i].name)
-            //     this.fileName = event.target.files[i].name;
-            // }
         },
         deleteAction : function(){
-            var self = this;
-            // console.log(this.index);
-            if (this.callback == undefined) {
-                this.file.base64 = '';
-                event.target.files = {}
-                const input = this.$refs.fileupload;
-                input.type = 'text';
-                input.type = 'file';
-            } else {
+            if (this.callback != undefined) {
                 this.callback(this.index, function () {
-                    // self.file.base64 = '';
-                    // event.target.files = {}
-                    // const input = self.$refs.fileupload;
-                    // input.type = 'text';
-                    // input.type = 'file';
+                    if (this.actionType == 'single') {
+                        this.file.base64 = '';
+                        event.target.files = {}
+                        const input = this.$refs.fileupload;
+                        input.type = 'text';
+                        input.type = 'file';
+                    }
                 });
+            }else{
+                if (this.actionType == 'single') {
+                    this.file.base64 = '';
+                    event.target.files = {}
+                    const input = this.$refs.fileupload;
+                    input.type = 'text';
+                    input.type = 'file';
+                }
             }
         }
     },
     computed : {
         sourceImage : function(){
-            console.log('hi');
-            // console.log(this.file.imageUrl);
             if (this.file.imageUrl == '' && this.file.base64 == '') {
-                // console.log('first');
                 return this.blankImageUrl;
-            }else if ( this.file.imageUrl != '' ){
-                // console.log('second');
-                return this.file.imageUrl;
-            }else{
-                // console.log('third');
+            } else if (this.file.base64 != '' ){
                 return this.file.base64;
+            }else{
+                return this.file.imageUrl;
             }
         },
         deleteButton : function(){
@@ -94,7 +78,6 @@ Vue.component('image-selector', {
                 }else{
                     return true;
                 }
-                
             }else{
                 return true;
             }
@@ -104,8 +87,6 @@ Vue.component('image-selector', {
         file: {
             handler: function (newValue) {
                 this.file = newValue
-                // console.log(newValue.base64)
-                // console.log("New age: " + newValue.age)
             },
             deep: true
         },
@@ -115,12 +96,5 @@ Vue.component('image-selector', {
     },
     mounted(){
         this.actionType = this.type == undefined ? 'single' : this.type;
-        this.file.order = Math.floor((Math.random() * 100) + 1);
-        // console.log(this.file_index);
-        // console.log(this.file);
-        // console.log(this.index);
-        // console.log(this.allFiles);
-        // console.log(this.type);
-        // console.log(this.callback);
     }
 })
