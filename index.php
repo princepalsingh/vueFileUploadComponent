@@ -9,6 +9,7 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
         <link rel="stylesheet" href="fileupload.css">
+        <link rel="stylesheet" href="multipleImageUpload.css">
         <title>Hello, world!</title>
     </head>
     <body>
@@ -26,19 +27,24 @@
                             <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password" v-model="formData.password">
                         </div>
                         <!-- <input type="file" name="myFile" multiple=""  @change="onFileChanged"> -->
-                        <div class="d-flex">
-                            <!-- <template v-for="( file,index ) in formData.images">
-                                <image-selector v-model="file" :file_index="index" :type="'single'" :callback="myFunction" :key="file.order"></image-selector>
-                            </template> -->
-
-                            <template>
-                                <image-selector v-model="formData.images" :type="'single'" :callback="myFunction" :key="formData.images.order"></image-selector>
+                        <div class="row px-2">
+                            <template v-for="( file,index ) in formData.images">
+                                <image-selector v-model="file" :file_index="index" :type="'multiple'" :callback="myFunction" :key="file.order"></image-selector>
                             </template>
+
+                            <!-- <template>
+                                <image-selector v-model="formData.images" :type="'single'" :callback="myFunction" :key="formData.images.order"></image-selector>
+                            </template> -->
                         </div>
                         <div class="form-group">
                            <button class="btn btn-primary" @click="addFile">Add</button>
                         </div>
-                        <button type="submit" class="btn btn-primary" @click="submitForm">Submit</button>
+                        <div class="my-2">
+                            <multiple-image-selector v-model="formData.images"></multiple-image-selector>
+                        </div>
+                        <div class="form-group">
+                            <button type="submit" class="btn btn-primary" @click="submitForm">Submit</button>
+                        </div>
                     <!-- </form> -->
                 </div>
                 <div class="col-md-6"></div>
@@ -51,6 +57,7 @@
         <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
         <script src="https://cdn.jsdelivr.net/npm/vue"></script>
         <script src="imageUpload.js"></script>
+        <script src="multipleImageUpload.js"></script>
         <script>
               var app = new Vue({
                 el: '#app',
@@ -61,18 +68,18 @@
                     formData : {
                         email : '',
                         password : '',
-                        // images : [{
-                        //             order : 0,
-                        //             caption: '',
-                        //             imageUrl : '',
-                        //             base64 : ''
-                        //         }]
-                        images : {
+                        images : [{
                                     order : 0,
                                     caption: '',
                                     imageUrl : '',
                                     base64 : ''
-                                }       
+                                }]
+                        // images : {
+                        //             order : 0,
+                        //             caption: '',
+                        //             imageUrl : '',
+                        //             base64 : ''
+                        //         }       
                     }
                 },
                 methods: {
