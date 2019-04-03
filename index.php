@@ -27,7 +27,7 @@
                             <input type="password" name="password" class="form-control" id="exampleInputPassword1" placeholder="Password" v-model="formData.password">
                         </div>
                         <!-- <input type="file" name="myFile" multiple=""  @change="onFileChanged"> -->
-                        <div class="row px-2">
+                        <div class="d-flex flex-wrap px-2" v-if="formData.images.length != 0">
                             <template v-for="( file,index ) in formData.images">
                                 <image-selector v-model="file" :file_index="index" :type="'multiple'" :callback="myFunction" :key="file.order"></image-selector>
                             </template>
@@ -35,11 +35,13 @@
                             <!-- <template>
                                 <image-selector v-model="formData.images" :type="'single'" :callback="myFunction" :key="formData.images.order"></image-selector>
                             </template> -->
+                            <div class="col-md-2">
+                                <div class="form-group">
+                                    <button class="btn btn-primary" @click="addFile">Add</button>
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                           <button class="btn btn-primary" @click="addFile">Add</button>
-                        </div>
-                        <div class="my-2">
+                        <div class="my-2" v-else>
                             <multiple-image-selector v-model="formData.images"></multiple-image-selector>
                         </div>
                         <div class="form-group">
@@ -68,12 +70,7 @@
                     formData : {
                         email : '',
                         password : '',
-                        images : [{
-                                    order : 0,
-                                    caption: '',
-                                    imageUrl : '',
-                                    base64 : ''
-                                }]
+                        images : []
                         // images : {
                         //             order : 0,
                         //             caption: '',
